@@ -10,17 +10,44 @@ f.close()
 YOUTUBE_API_SERVICE_NAME = 'youtube'
 YOUTUBE_API_VERSION = 'v3'
 
-SEARCH_TERM = 'coronavirus'
-
 youtube = build(YOUTUBE_API_SERVICE_NAME, YOUTUBE_API_VERSION,
     developerKey=DEVELOPER_KEY)
 
-def get_related_videos(id):
+def gather_data(searchTerm, maxDepth):
+    seedNodes = youtube_search(searchTerm)
+
+    # we want to avoid redundancy in our search
+    visited = set()
+
+    queue = []
+
+    for seed in seedNodes:
+        queue.append(seed)
+        visited.add(seed.id)
+
+    depth = 0
+
+    while queue and depth <= maxDepth:
+        n = queue.pop(0)
+
+        relatedVideos = get_related_videos(n.id, n.foundAtDepth)
+
+        for vid in relatedVideos:
+            if vid.id not in visited:
+                visited.add(vid.id)
+                print('Edge between ' + n.id + ' and ' + vid.id)
+                queue.append(vid)
+
+        depth = n.foundAtDepth + 1
+
+
+
+def get_related_videos(id, currDepth):
     search_response = youtube.search().list(
         relatedToVideoId=id,
         type='video',
         part='id,snippet',
-        maxResults=5
+        maxResults=3
     ).execute()
 
     neighbors = []
@@ -31,25 +58,21 @@ def get_related_videos(id):
         if search_result['id']['kind'] == 'youtube#video':
             id = search_result['id']['videoId']
             title = search_result['snippet']['title']
-            video = Video(id, title)
+            video = Video(id, title, currDepth + 1)
             neighbors.append(video)
         else:
             print('Found something that was not a video')
-
-
-    for neighbor in neighbors:
-        print(neighbor.title)
 
     return neighbors
 
 
 
-def youtube_search():
+def youtube_search(searchTerm):
 
     # Call the search.list method to retrieve results matching the specified
     # query term.
     search_response = youtube.search().list(
-        q=SEARCH_TERM,
+        q=searchTerm,
         type='video',
         part='id,snippet',
         maxResults=3
@@ -63,14 +86,10 @@ def youtube_search():
         if search_result['id']['kind'] == 'youtube#video':
             id = search_result['id']['videoId']
             title = search_result['snippet']['title']
-            video = Video(id, title)
+            video = Video(id, title, 0)
             seedVideos.append(video)
         else:
             print('Found something that was not a video')
-
-
-    for vid in seedVideos:
-        print(vid.id)
 
     return seedVideos
 
@@ -78,6 +97,7 @@ if __name__ == '__main__':
 
     try:
         # youtube_search()
-        get_related_videos('BJXq83_GvY8')
+        # get_related_videos('BJXq83_GvY8')
+        gather_data('coronavirus', 3)
     except HttpError, e:
         print 'An HTTP error %d occurred:\n%s' % (e.resp.status, e.content)
