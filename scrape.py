@@ -21,11 +21,18 @@ def gather_data(searchTerm, maxDepth):
 
     queue = []
 
+    f = open("edgelist.txt", "w")
+    f2 = open("nodeattributes.txt", "w")
+
     for seed in seedNodes:
         queue.append(seed)
         visited.add(seed.id)
+        f2.write(','.join((seed.id, seed.title)).encode('utf-8'))
+        f2.write('\n')
 
     depth = 0
+
+
 
     while queue and depth <= maxDepth:
         n = queue.pop(0)
@@ -35,11 +42,16 @@ def gather_data(searchTerm, maxDepth):
         for vid in relatedVideos:
             if vid.id not in visited:
                 visited.add(vid.id)
-                print('Edge between ' + n.id + ' and ' + vid.id)
+                f.write(','.join((n.id,vid.id)).encode('utf-8'))
+                f.write('\n')
+                f2.write(','.join((vid.id, vid.title)).encode('utf-8'))
+                f2.write('\n')
                 queue.append(vid)
 
         depth = n.foundAtDepth + 1
 
+    f.close()
+    f2.close()
 
 
 def get_related_videos(id, currDepth):
@@ -96,8 +108,8 @@ def youtube_search(searchTerm):
 if __name__ == '__main__':
 
     try:
-        # youtube_search()
+        # youtube_search('coronavirus')
         # get_related_videos('BJXq83_GvY8')
-        gather_data('coronavirus', 3)
+        gather_data('coronavirus', 1)
     except HttpError, e:
         print 'An HTTP error %d occurred:\n%s' % (e.resp.status, e.content)
