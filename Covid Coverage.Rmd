@@ -1,0 +1,26 @@
+---
+title: "Covid-Coverage"
+author: "Zack Johnson"
+date: "6/3/2020"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+``` {r packages}
+require("igraph")
+```
+
+``` {r data}
+
+NetworkEdges <-read.csv("edgelist.csv",header=TRUE)
+NetworkEdges <- as.matrix(NetworkEdges)
+
+#Create a Graph  from the Edges
+TheNetwork <- graph_from_edgelist(NetworkEdges, directed = TRUE)
+
+plot(TheNetwork, vertex.label.cex=0.2, vertex.size = 4, edge.arrow.size=0.1)
+```

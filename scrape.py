@@ -110,6 +110,6 @@ if __name__ == '__main__':
     try:
         # youtube_search('coronavirus')
         # get_related_videos('BJXq83_GvY8')
-        gather_data('coronavirus', 1)
+        gather_data('coronavirus', 5)
     except HttpError, e:
         print 'An HTTP error %d occurred:\n%s' % (e.resp.status, e.content)
