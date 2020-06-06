@@ -21,8 +21,8 @@ def gather_data(searchTerm, maxDepth):
 
     queue = []
 
-    f = open("edgelist.txt", "w")
-    f2 = open("nodeattributes.txt", "w")
+    f = open("edgelist2.txt", "w")
+    f2 = open("nodeattributes2.txt", "w")
 
     for seed in seedNodes:
         queue.append(seed)
@@ -32,18 +32,16 @@ def gather_data(searchTerm, maxDepth):
 
     depth = 0
 
-
-
     while queue and depth <= maxDepth:
         n = queue.pop(0)
 
         relatedVideos = get_related_videos(n.id, n.foundAtDepth)
 
         for vid in relatedVideos:
+            f.write(','.join((n.id,vid.id)).encode('utf-8'))
+            f.write('\n')
             if vid.id not in visited:
                 visited.add(vid.id)
-                f.write(','.join((n.id,vid.id)).encode('utf-8'))
-                f.write('\n')
                 f2.write(','.join((vid.id, vid.title)).encode('utf-8'))
                 f2.write('\n')
                 queue.append(vid)
@@ -57,6 +55,10 @@ def gather_data(searchTerm, maxDepth):
 def get_related_videos(id, currDepth):
     search_response = youtube.search().list(
         relatedToVideoId=id,
+        regionCode='US',
+        relevanceLanguage='en',
+        safeSearch='none',
+        fields='items(id, snippet/title)',
         type='video',
         part='id,snippet',
         maxResults=3
@@ -85,6 +87,10 @@ def youtube_search(searchTerm):
     # query term.
     search_response = youtube.search().list(
         q=searchTerm,
+        regionCode='US',
+        relevanceLanguage='en',
+        safeSearch='none',
+        fields='items(id, snippet/title)',
         type='video',
         part='id,snippet',
         maxResults=3
