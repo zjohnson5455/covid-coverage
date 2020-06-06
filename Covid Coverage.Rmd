@@ -21,7 +21,7 @@ NetworkEdges <- as.matrix(NetworkEdges)
 NodeAttributes <- read.csv("nodeattributes2.csv")
 names(NodeAttributes) <- c('Id','Title')
 
-videos <- data.frame(id=NodeAttributes$Id, title=NodeAttributes$Title)
+videos <- data.frame(name=NodeAttributes$Id, title=NodeAttributes$Title)
 
 links <- data.frame(from=NetworkEdges[,1], to=NetworkEdges[,2])
 
@@ -48,9 +48,12 @@ barplot(degree.distribution(TheNetwork),ylab='Proportion of Nodes',xlab='Degree 
 sum(component_distribution(TheNetwork))
 ```
 
+``` {r degree}
+
+igraph::degree(TheNetwork)
 
 
-
+```
 
 
 
