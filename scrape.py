@@ -21,13 +21,13 @@ def gather_data(searchTerm, maxDepth):
 
     queue = []
 
-    f = open("edgelist2.txt", "w")
-    f2 = open("nodeattributes2.txt", "w")
+    f = open("edgelist3.txt", "w")
+    f2 = open("nodeattributes3.txt", "w")
 
     for seed in seedNodes:
         queue.append(seed)
         visited.add(seed.id)
-        f2.write(','.join((seed.id, seed.title)).encode('utf-8'))
+        f2.write(','.join((seed.id, seed.title, str(seed.foundAtDepth))).encode('utf-8'))
         f2.write('\n')
 
     depth = 0
@@ -42,7 +42,7 @@ def gather_data(searchTerm, maxDepth):
             f.write('\n')
             if vid.id not in visited:
                 visited.add(vid.id)
-                f2.write(','.join((vid.id, vid.title)).encode('utf-8'))
+                f2.write(','.join((vid.id, vid.title, str(vid.foundAtDepth))).encode('utf-8'))
                 f2.write('\n')
                 queue.append(vid)
 

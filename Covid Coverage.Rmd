@@ -15,19 +15,82 @@ require("igraph")
 ```
 
 ``` {r data}
-NetworkEdges <- read.csv("edgelist2.csv",header=TRUE)
+NetworkEdges <- read.csv("edgelist3.csv",header=TRUE)
 NetworkEdges <- as.matrix(NetworkEdges)
 
-NodeAttributes <- read.csv("nodeattributes2.csv")
-names(NodeAttributes) <- c('Id','Title')
+NodeAttributes <- read.csv("nodeattributes3.csv")
+names(NodeAttributes) <- c('Id','Title','Depth','CovidRelated')
 
-videos <- data.frame(name=NodeAttributes$Id, title=NodeAttributes$Title)
+videos <- data.frame(id=NodeAttributes$Id, title=NodeAttributes$Title, depth=NodeAttributes$Depth, covidRelated=NodeAttributes$CovidRelated)
 
 links <- data.frame(from=NetworkEdges[,1], to=NetworkEdges[,2])
 
 TheNetwork <- graph_from_data_frame(links, directed=TRUE, vertices=videos)
 
-plot(TheNetwork, vertex.label.cex=0.2, vertex.size = 4, edge.arrow.size=0.1)
+thelayout = layout.fruchterman.reingold(TheNetwork)
+
+plot(TheNetwork, vertex.label.cex=0.2, vertex.size = 4, edge.arrow.size=0.1, layout = thelayout)
+plot(TheNetwork, vertex.label.cex=0.2, vertex.size = 4, edge.arrow.size=0.1, vertex.color=V(TheNetwork)$depth, layout = thelayout)
+plot(TheNetwork, vertex.label.cex=0.2, vertex.size = 4, edge.arrow.size=0.1, vertex.color=V(TheNetwork)$covidRelated, layout = thelayout)
+```
+
+
+
+
+
+``` {r mixingMatrix}
+# referenced https://gist.github.com/chengjun/2410446
+
+mixmat <- function(mygraph, attrib, use.density=TRUE) {
+  
+  # get unique list of characteristics of the attribute
+  attlist <- sort(unique(vertex_attr(mygraph,attrib)))
+  
+  numatts <- length(attlist)
+
+  # build an empty mixing matrix by attribute
+  mm <- matrix(nrow=numatts, 
+               ncol=numatts,
+               dimnames=list(attlist,attlist))
+  
+  # calculate edge density for each matrix entry by pairing type
+  # lends itself to parallel if available
+  el <- get.edgelist(mygraph,names=FALSE)
+  for (i in 1:numatts) {
+    for (j in 1:numatts) {
+      mm[i,j] <- length(which(apply(el,1,function(x) { 
+          vertex_attr(mygraph, attrib, x[1] ) == attlist[i] && 
+            vertex_attr(mygraph, attrib, x[2] ) == attlist[j]  } )))
+    }  
+  }
+  
+  # convert to proportional mixing matrix if desired (ie by edge density)
+  if (use.density) mm/ecount(mygraph) else mm
+}
+
+mmDepth <- mixmat(TheNetwork, 'depth', FALSE)
+mmDepth
+
+print("----")
+
+mmCovid <- mixmat(TheNetwork, 'covidRelated', FALSE)
+mmCovid
+```
+
+``` {r covidDist}
+table(V(TheNetwork)$covidRelated)
+print('-------')
+table(V(TheNetwork)$depth, V(TheNetwork)$covidRelated)
+```
+
+``` {r reachBackDistribution}
+
+sentTiesForward <- c(20/27, 45/57, 86/120, 41/71)
+plot(sentTiesForward)
+
+# of ties sent back, how far back were they sent
+sentBackDistance <- c(7 + 5 + 18 + 10, 7 + 15 + 16, 1 + 4, 0, 0)
+barplot(sentBackDistance, ylab='Number of Edges',xlab='Difference in Depth (0 to 4)')
 ```
 
 
@@ -49,10 +112,7 @@ sum(component_distribution(TheNetwork))
 ```
 
 ``` {r degree}
-
 igraph::degree(TheNetwork)
-
-
 ```
 
 
