@@ -15,12 +15,81 @@ require("igraph")
 ```
 
 ``` {r data}
-
-NetworkEdges <-read.csv("edgelist.csv",header=TRUE)
+NetworkEdges <- read.csv("edgelist2.csv",header=TRUE)
 NetworkEdges <- as.matrix(NetworkEdges)
 
-#Create a Graph  from the Edges
-TheNetwork <- graph_from_edgelist(NetworkEdges, directed = TRUE)
+NodeAttributes <- read.csv("nodeattributes2.csv")
+names(NodeAttributes) <- c('Id','Title')
+
+videos <- data.frame(id=NodeAttributes$Id, title=NodeAttributes$Title)
+
+links <- data.frame(from=NetworkEdges[,1], to=NetworkEdges[,2])
+
+TheNetwork <- graph_from_data_frame(links, directed=TRUE, vertices=videos)
 
 plot(TheNetwork, vertex.label.cex=0.2, vertex.size = 4, edge.arrow.size=0.1)
 ```
+
+
+```{r clique}
+largest_cliques(TheNetwork)
+```
+
+``` {r density}
+igraph::edge_density(TheNetwork)
+```
+
+``` {r degreeDistribution}
+barplot(degree.distribution(TheNetwork),ylab='Proportion of Nodes',xlab='Degree (0 through 18)')
+```
+
+
+``` {r components}
+sum(component_distribution(TheNetwork))
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
