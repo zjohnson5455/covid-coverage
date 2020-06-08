@@ -29,6 +29,20 @@ TheNetwork <- graph_from_data_frame(links, directed=TRUE, vertices=videos)
 
 thelayout = layout.fruchterman.reingold(TheNetwork)
 
+```
+
+``` {r betweenness}
+betweenness <- igraph::betweenness(TheNetwork)
+depth <- V(TheNetwork)$depth
+degree <- igraph::degree(TheNetwork)
+
+plot(betweenness)
+plot(depth)
+plot(degree)
+plot(depth, betweenness)
+```
+
+``` {r plotter}
 plot(TheNetwork, vertex.label.cex=0.2, vertex.size = 4, edge.arrow.size=0.1, layout = thelayout)
 plot(TheNetwork, vertex.label.cex=0.2, vertex.size = 4, edge.arrow.size=0.1, vertex.color=V(TheNetwork)$depth, layout = thelayout)
 plot(TheNetwork, vertex.label.cex=0.2, vertex.size = 4, edge.arrow.size=0.1, vertex.color=V(TheNetwork)$covidRelated, layout = thelayout)
@@ -71,10 +85,10 @@ mixmat <- function(mygraph, attrib, use.density=TRUE) {
 mmDepth <- mixmat(TheNetwork, 'depth', FALSE)
 mmDepth
 
-print("----")
+# print("----")
 
-mmCovid <- mixmat(TheNetwork, 'covidRelated', FALSE)
-mmCovid
+#mmCovid <- mixmat(TheNetwork, 'covidRelated', FALSE)
+#mmCovid
 ```
 
 ``` {r covidDist}
@@ -103,7 +117,7 @@ igraph::edge_density(TheNetwork)
 ```
 
 ``` {r degreeDistribution}
-barplot(degree.distribution(TheNetwork),ylab='Proportion of Nodes',xlab='Degree (0 through 18)')
+barplot(degree.distribution(TheNetwork),ylab='Proportion of Nodes',xlab='Degree (0 through 9)')
 ```
 
 
@@ -114,10 +128,6 @@ sum(component_distribution(TheNetwork))
 ``` {r degree}
 igraph::degree(TheNetwork)
 ```
-
-
-
-
 
 
 
