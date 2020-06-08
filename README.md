@@ -24,3 +24,9 @@ With this network created, there are a few different types of analysis that can 
 up. We can compare the content of the seeds to the content each level out and see how they change. We can try to determine if 
 there are distinct 'bubbles' that exist within coverage along partisan lines. I'll try to shift my analysis to match the type 
 and amount of data I can gather.
+
+
+### Update: 
+The resulting analysis looked at centrality, ties between nodes of different depths, and the extent to which the nodes stayed related to the original search term.
+
+The final write-up can be found in the Covid Coverage.pdf file.
